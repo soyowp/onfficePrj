@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.office.mapper.NoticeMapper">
+
+	<!-- 글 조회 로직 -->
+	<select id="noticeList" resultType="org.office.domain.NoticeVO">
+	 <![CDATA[
+			select * from notice where notice_num > 0
+			order by notice_num desc limit #{pageStart}, #{amount}
+		 ]]>
+	</select>
+	
+	<select id="getTotalNotice" resultType="int">
+		SELECT count(*) FROM notice
+	</select>
+	
+	
+	<select id="lobbyNList" resultType="org.office.domain.NoticeVO">
+	 <![CDATA[
+		select *
+		from notice
+		order by notice_num desc
+		limit 0, 5
+		 ]]>
+	</select>
+	
+	<!-- 글 상세보기 로직 -->
+	<select id="notice_detail" resultType="org.office.domain.NoticeVO">
+		SELECT * FROM notice WHERE notice_num = #{notice_num}
+	</select>
+	
+	<!-- 글 카테고리 로직 -->
+	<select id="category" resultType="org.office.domain.NoticeVO">
+	 <![CDATA[
+	select * from notice  
+	where notice_num >0 and ncategory=#{ncategory} 
+	order by notice_num desc 
+	limit #{PageStart}, #{amount}
+     ]]>
+	</select>
+	
+	<select id="getTotalNoticeCate" resultType="int">
+		SELECT count(*) FROM notice WHERE ncategory=#{ncategory}
+	</select>
+	
+	<!-- 글 조회수 증가 로직 -->
+	<update id="nhit_up">
+		UPDATE notice SET nhits = nhits + 1 WHERE notice_num = #{notice_num} 
+		
+	</update>
+
+	<!-- 글 작성 로직 -->
+	<insert id="write">
+		INSERT INTO NOTICE
+		VALUES(notice_num.nextval, #{id}, #{ntitle}, #{ncontent},
+		#{nwriter})
+	</insert>
+
+	<insert id="writeSelectkey">
+		<selectKey keyProperty="notice_num" order="BEFORE"
+			resultType="int">
+			SELECT IF(ISNULL(notice_num), 1, max(notice_num) + 1) AS notice_num FROM notice
+		</selectKey>
+		INSERT INTO NOTICE 
+		VALUES(#{notice_num}, #{ncategory}, #{ntitle}, #{ncontent}, #{nwriter}, now(), now(), 0)
+	</insert>
+
+	<!-- 글 삭제 로직 -->	
+	<delete id="delete">
+		DELETE FROM notice WHERE notice_num=#{notice_num};
+	</delete>
+	
+	<!-- 글 수정 로직 -->
+	<update id="update">
+		UPDATE notice SET ntitle=#{ntitle}, ncontent=#{ncontent}, nwriter=#{nwriter}, nupdate=sysdate() where notice_num=#{notice_num};
+	
+	</update>
+
+
+</mapper>
+

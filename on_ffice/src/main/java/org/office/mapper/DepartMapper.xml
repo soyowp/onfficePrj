@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.office.mapper.DepartMapper">
+
+
+	<!-- 각 부서 정보 조회(dp_code, depart_name, count) -->
+	<select id = "selectDpInfo" resultType="org.office.domain.DepartVO">
+		select depart.dp_code, depart.depart_name as depart_name, count(*) as count
+	    from users, depart
+	    where users.dp_code = depart.dp_code AND users.stat is not null
+	    group by users.dp_code
+	    having users.dp_code = #{dp_code}
+	</select>
+
+	<!-- 회원가입시 depart테이블의 count 숫자 증가 -->
+	<update id="UpCount">
+		update depart set count = count + 1 where dp_code= #{dp_code}
+	</update>
+
+	<select id="selectDpList" resultType="org.office.domain.DepartVO">
+		select * from depart
+	</select>
+
+</mapper>
+
+

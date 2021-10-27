@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.office.mapper.DpCReplyMapper">
+	
+	<select id="getList" resultType="org.office.domain.DpCReplyVO">
+		SELECT * FROM reply_depart_community WHERE dp_community = #{dp_community} ORDER BY dno DESC
+	</select>
+	
+	<insert id="create">
+		<selectKey keyProperty="dno" order="BEFORE" resultType="int">
+			SELECT IF(ISNULL(dno), 1, max(dno) + 1) AS dpcreply_num FROM reply_depart_community 
+		</selectKey>
+		INSERT INTO reply_depart_community(dno, dp_community, reply, replyer) VALUES(#{dno}, #{dp_community}, #{reply}, #{replyer})
+	</insert>
+	
+	<update id="update">
+		UPDATE reply_depart_community SET reply = #{reply}, updatedate = now() WHERE dno = #{dno}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM reply_depart_community WHERE dno = #{dno} 
+	</delete>
+
+</mapper>

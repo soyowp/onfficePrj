@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.office.mapper.ReplyMapper">
+	<select id="getList" resultType="org.office.domain.ReplyVO">
+		SELECT * FROM reply_notice WHERE notice = #{notice} ORDER BY rno DESC
+	</select>
+	
+	<insert id="create">
+		<selectKey keyProperty="rno" order="BEFORE"
+			resultType="int">
+			SELECT IF(ISNULL(rno), 1, max(rno) + 1) AS reply_num FROM reply_notice
+		</selectKey>
+		INSERT INTO reply_notice (rno, notice, reply, replyer) VALUES(#{rno}, #{notice}, #{reply}, #{replyer})
+	</insert>
+	
+	<update id="update">
+		UPDATE reply_notice
+		SET	
+		reply= #{reply}, updatedate = now() WHERE rno = #{rno}
+	
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM reply_notice WHERE rno = #{rno}
+	
+	</delete>
+
+</mapper>

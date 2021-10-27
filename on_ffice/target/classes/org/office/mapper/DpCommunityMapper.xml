@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.office.mapper.DpCommunityMapper">
+
+		<sql id = "search">
+		  	   <if test="searchType != null">
+		        	<if test="searchType == 't'.toString()">
+		        		AND dtitle like CONCAT('%', #{keyword},'%')
+		        	</if>
+		        	<if test="searchType == 'tc'.toString()">
+		    			AND (dtitle like CONCAT('%', #{keyword}, '%') OR
+		    				dcontent like CONCAT('%', #{keyword}, '%')) 
+		    		</if>
+		    		<if test="searchType == 'w'.toString()">
+		    			AND dwriter like CONCAT('%', #{keyword},'%')
+		    		</if>
+		       </if>
+		</sql>
+
+
+<!-- 부서로비에서 글 조회하는 로직 -->
+<select id="DpCommunityList" resultType="org.office.domain.DpCommunityVO">
+	
+	SELECT * FROM depart_community WHERE dp_code = #{dp_code} ORDER BY dc_num DESC limit 0, 5
+
+</select>
+
+<!-- 페이징 처리 로직 -->
+<select id="DpCList" resultType="org.office.domain.DpCommunityVO">
+	<![CDATA[
+		SELECT * FROM depart_community WHERE dp_code = #{dp_code}
+	]]>
+		<include refid="search"></include>
+		
+	<![CDATA[
+		ORDER BY dc_num DESC limit #{PageStart}, #{amount} 
+	]]>
+</select>
+
+<!-- 글 전체 가져오는 로직 -->
+<select id="getTotalBoard" resultType="int">
+	<![CDATA[
+		SELECT COUNT(*) FROM depart_community WHERE dp_code = #{dp_code}
+	]]>
+		<include refid="search"></include>
+</select>
+
+<!-- 글 상세보기 로직 -->
+<select id="DpCdetail" resultType="org.office.domain.DpCommunityVO">
+	SELECT * FROM depart_community WHERE dc_num = #{dc_num}
+</select>
+
+<!-- 글 조회수 증가 로직 -->
+<update id="dhit_up">
+	UPDATE depart_community SET dhits = dhits + 1 WHERE dc_num = #{dc_num}
+</update>
+
+<!-- 글 작성 로직 -->
+<insert id="DpCwrite">
+	INSERT INTO depart_community
+	VALUES(#{dc_num}, #{dp_code}, #{empno}, #{dtitle}, #{dcontent}, #{dwriter}, now(), now(), 0)
+</insert>
+
+<insert id="DpCwriteSelectKey">
+	<selectKey keyProperty="dc_num" order="BEFORE" resultType="int">
+		SELECT IF (ISNULL(dc_num), 1, max(dc_num) + 1) AS dc_num FROM depart_community;
+	</selectKey>
+	INSERT INTO depart_community 
+		VALUES(#{dc_num}, #{dp_code}, #{empno}, #{dtitle}, #{dcontent}, #{dwriter}, now(), now(), 0)
+</insert>
+
+<!-- 글 수정 로직 -->
+<update id="DpCupdate">
+	UPDATE depart_community SET dtitle = #{dtitle}, dcontent = #{dcontent}, 
+		dwriter = #{dwriter}, dupdate = sysdate() where dc_num = #{dc_num}
+</update>
+
+<!-- 글 삭제 로직 -->
+<delete id="DpCdelete">
+	DELETE FROM depart_community WHERE dc_num = #{dc_num};
+</delete>
+
+</mapper>

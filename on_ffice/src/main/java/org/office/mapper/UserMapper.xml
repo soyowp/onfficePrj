@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.office.mapper.UserMapper">
+
+<!-- 회원가입 로직 -->
+<insert id="insert">
+	INSERT INTO users (empno, uid, upw, name, profile_img, gender, birth, email, cp, dp_code, position_code)
+    VALUES (null, #{uid}, #{upw}, #{name}, #{profile_img}, #{gender}, #{birth}, #{email}, #{cp}, #{dp_code}, #{position_code})
+</insert>
+
+<!-- 로그인 로직 -->
+<select id="select" resultType="org.office.domain.UserVO">
+	      SELECT * ,
+        (select depart_name
+        from depart
+        where dp_code=users.dp_code) as depart_name,
+        (select p_name
+        from positions
+        where p_code=users.position_code) as p_name
+        FROM users
+        WHERE uid = #{uid}
+</select>
+
+<!-- id 중복검사 로직 -->
+<select id="selectIdCount" resultType="int">
+	SELECT count(*) FROM users WHERE uid = #{uid}
+</select>
+
+<!-- email 중복검사 로직 -->
+<select id="selectEmailCount" resultType="int">
+	SELECT count(*) FROM users WHERE email = #{email}
+</select>
+
+<!-- 유저 정보 조회 로직 -->
+<select id="selectUser" resultType="org.office.domain.UserVO">
+	SELECT * FROM users WHERE uid = #{uid}
+</select>
+
+<!-- 가입된 모든 유저 리스트 조회 -->
+<select id="selectUserList" resultType="org.office.domain.UserVO">
+	<![CDATA[
+	select users.*,depart_name, positions.p_name as job
+	from users, positions, depart
+	where users.position_code = positions.p_code  AND users.dp_code = depart.dp_code AND users.stat != "가입거절"
+	order by position_code desc
+
+	]]>
+</select>
+
+<!-- 부서별 유저 리스트 조회 -->
+<select id="selectUserListByDp" resultType="org.office.domain.UserVO">
+	select empno, uid, name, gender, birth, email, cp, p_name, dp_code, p_salary, stat
+    from users, positions
+    where users.position_code = positions.p_code and users.dp_code = 1 AND users.stat in ("온라인", "오프라인", "가입승인", "부재중")
+    order by position_code desc
+</select>
+
+<!-- 부서별 인원수 조회 -->
+<select id="selectCountByDp">
+	select depart.depart_name as depart_name, count(*)
+    from users, depart
+    where users.dp_code = depart.dp_code AND users.stat is not null
+    group by users.dp_code
+    having users.dp_code = #{dp_code}
+</select>
+
+
+<!-- 유저 정보 수정 로직 -->
+<update id="updateUser">
+	UPDATE users set uid=#{uid}, upw=#{upw}, name=#{name}, profile_img=#{profile_img}, gender=#{gender}, birth=#{birth}, position_code=#{position_code}, email=#{email}, cp=#{cp}, dp_code=#{dp_code}
+	WHERE uid = #{uid}
+</update>
+
+<!-- 회원 탈퇴 로직 -->
+<delete id="deleteUser">
+	DELETE FROM users WHERE uid = #{uid}
+</delete>
+
+<update id="updateStat">
+	UPDATE users set stat=#{stat} WHERE uid = #{uid}
+</update>
+
+<select id="selectNullStat" resultType="org.office.domain.UserVO">
+	select * from users where stat IS NULL
+</select>
+
+</mapper>

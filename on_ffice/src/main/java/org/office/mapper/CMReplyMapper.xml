@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.office.mapper.CMReplyMapper">
+
+	<select id="getList" resultType="org.office.domain.CMReplyVO">
+		SELECT * FROM reply_community WHERE community = #{community} ORDER BY cno DESC
+	</select>
+	
+	<insert id="create">
+		<selectKey keyProperty="cno" order="BEFORE" resultType="int">
+			SELECT IF(ISNULL(cno), 1, max(cno) + 1) AS cmreply_num FROM reply_community
+		</selectKey>
+		INSERT INTO reply_community(cno, community, reply, replyer) VALUES(#{cno}, #{community}, #{reply}, #{replyer})
+	</insert>
+	
+	<update id="update">
+		UPDATE reply_community SET reply = #{reply}, updatedate = now() WHERE cno = #{cno}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM reply_community WHERE cno = #{cno}
+	</delete>
+
+</mapper>

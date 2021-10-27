@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.office.mapper.CommunityMapper">
+
+	<!-- 글 조회 로직 -->
+
+	<select id="CommunityList" resultType="org.office.domain.CommunityVO">
+	 <![CDATA[
+		
+		select * from community where community_num > 0
+		order by community_num desc limit #{pageStart}, #{amount}
+		 ]]>
+	</select>
+	
+	<select id="getTotalCommunity" resultType="int">
+		SELECT count(*) FROM community
+	</select>
+	
+	<!-- 글 상세보기 로직 -->
+	<select id="Community_detail" resultType="org.office.domain.CommunityVO">
+		SELECT * FROM community WHERE community_num = #{community_num}
+	</select>
+	
+	<!-- 글 조회수 증가 로직 -->
+	<update id="chit_up">
+		UPDATE community SET chits = chits + 1 WHERE community_num = #{community_num} 
+		
+	</update>
+
+	<!-- 글 작성 로직 -->
+	<insert id="write">
+		INSERT INTO NOTICE
+		VALUES(notice_num.nextval, #{id}, #{ntitle}, #{ncontent},
+		#{nwriter} {ncw})
+	</insert>
+
+	<insert id="writeSelectkey">
+		<selectKey keyProperty="community_num" order="BEFORE"
+			resultType="int">
+			SELECT IF(ISNULL(community_num), 1, max(community_num) + 1) AS community_num FROM community;
+		</selectKey>
+		
+		INSERT INTO community
+		VALUES(#{community_num}, #{ctitle}, #{ccontent}, #{cwriter}, now(), now(), 0, #{cpw})
+		
+		
+	</insert>
+
+	<!-- 글 삭제 로직 -->	
+	<delete id="delete">
+		DELETE FROM community WHERE community_num=#{community_num};
+	</delete>
+	
+	<!-- 글 수정 로직 -->
+	<update id="update">
+		UPDATE community SET ctitle=#{ctitle}, ccontent=#{ccontent}, cwriter=#{cwriter}, cupdate=sysdate() where community_num=#{community_num};
+	
+	</update>
+
+
+</mapper>
+

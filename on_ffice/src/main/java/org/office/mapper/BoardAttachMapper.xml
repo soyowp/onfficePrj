@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.office.mapper.BoardAttachMapper">
+	
+	<insert id="insert">
+		INSERT INTO img_tbl (uuid, uploadPath, fileName, image, notice_num) 
+		VALUES (#{uuid}, #{uploadPath}, #{fileName}, #{image}, #{notice_num})
+	</insert>
+	
+	<delete id="delete">
+		DELETE FROM img_tbl WHERE uuid = #{uuid}
+	</delete>
+	
+	<select id ="findByNotice_num" resultType="org.office.domain.BoardAttachVO">
+		SELECT * FROM img_tbl WHERE notice_num = #{notice_num}
+	</select>
+	
+	<delete id="deleteAll">
+		DELETE FROM img_tbl WHERE notice_num=#{notice_num}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security
+	 http://www.springframework.org/schema/security/spring-security.xsd
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<bean id="AccessDenied" class="org.office.security.AccessDeniedHandler" />
+	<bean id="LoginSuccess" class="org.office.security.LoginSuccessHandler" />
+	<bean id="bcryPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+	
+	<security:http>
+		
+		<security:intercept-url pattern="/user/*" access="permitAll"/>
+		<security:intercept-url pattern="/mypage/*" access="permitAll"/>
+		
+	
+		<security:form-login login-page="/user/login"
+				authentication-success-handler-ref="LoginSuccess"/>
+		
+		<security:access-denied-handler ref="AccessDenied"/>
+		
+		<security:logout logout-url="/user/logout" invalidate-session="true"/>	
+	</security:http>
+	
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="dataSource"/>
+			
+			<security:password-encoder ref="bcryPasswordEncoder"/>
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+</beans>
